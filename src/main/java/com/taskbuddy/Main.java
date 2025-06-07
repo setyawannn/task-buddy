@@ -1,5 +1,6 @@
 package com.taskbuddy;
 
+import com.taskbuddy.cli.AuthenticationMenu;
 import com.taskbuddy.cli.MenuManager;
 import com.taskbuddy.utils.DatabaseConnection;
 
@@ -11,8 +12,8 @@ public class Main {
             if (DatabaseConnection.testConnection()) {
                 System.out.println("All good now.\n");
 
-                MenuManager menuManager = new MenuManager();
-                menuManager.start();
+                AuthenticationMenu authMenu = new AuthenticationMenu();
+                authMenu.start();
             } else {
                 System.err.println("Cannot start application - Database connection failed!");
             }
