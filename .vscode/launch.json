@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Main",
+      "request": "launch",
+      "mainClass": "com.taskbuddy.Main",
+      "projectName": "task-buddy_ac0e3560"
+    },
+    {
+      "type": "java",
+      "name": "Launch TaskBuddy",
+      "request": "launch",
+      "mainClass": "com.taskbuddy.Main",
+      "projectName": "TaskBuddy",
+      "classPaths": [
+        "build",
+        "lib/*"
+      ],
+      "console": "integratedTerminal",
+      "args": []
+    }
+  ]
+}
