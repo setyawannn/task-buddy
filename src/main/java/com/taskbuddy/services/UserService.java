@@ -5,6 +5,7 @@ import com.taskbuddy.utils.DatabaseConnection;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ArrayList;
 
 public class UserService {
     private List<User> users;
@@ -153,28 +154,53 @@ public class UserService {
         return null;
     }
 
-    public User findByUsername(String username) {
-        try {
-            Connection conn = DatabaseConnection.getConnection();
-            String sql = "SELECT * FROM users WHERE username = ?";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                int id = rs.getInt("id");
-                String email = rs.getString("email");
-                String password = rs.getString("password");
-                String roleStr = rs.getString("role");
-                User.Role role = User.Role.valueOf(roleStr.toUpperCase());
-                return new User(id, username, email, password, role);
-            }
-        } catch (Exception e) {
-            System.err.println("Error finding user by username: " + e.getMessage());
+    
+    public List<User> getAllUsers() {
+    List<User> users = new ArrayList<>();
+    try {
+        Connection conn = DatabaseConnection.getConnection();
+        String sql = "SELECT * FROM users";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            User user = new User(
+                    rs.getInt("id"),
+                    rs.getString("username"),
+                    rs.getString("email"),
+                    rs.getString("password"),
+                    User.Role.valueOf(rs.getString("role"))
+            );
+            users.add(user);
         }
-        return null;
+    } catch (SQLException e) {
+        System.err.println("Error fetching users: " + e.getMessage());
+    }
+    return users;
     }
 
-    public List<User> getAllUsers() {
-        return users;
+    public boolean deleteUserById(int userId) {
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            String sql = "DELETE FROM users WHERE id = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, userId);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error deleting user: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public User findByUsername(String username) {
+        for (User user : users) {
+            if (user.getUsername().equalsIgnoreCase(username)) {
+                return user;
+            }
+        }
+        return null; 
     }
 }

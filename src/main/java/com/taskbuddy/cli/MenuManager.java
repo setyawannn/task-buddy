@@ -1,7 +1,15 @@
 package com.taskbuddy.cli;
 
+import com.taskbuddy.models.Task;
 import com.taskbuddy.models.User;
 import com.taskbuddy.services.TaskService;
+import com.taskbuddy.structures.algorithm.TaskSearcher;
+import com.taskbuddy.structures.algorithm.TaskSorter;
+
+import java.util.ArrayList;
+import java.util.List;
+import com.taskbuddy.structures.linkedlist.ActivityLogger;
+
 import com.taskbuddy.services.UserQueue; // Add this import
 import com.taskbuddy.services.UserService; // Add this import
 import java.util.Scanner;
@@ -12,6 +20,7 @@ import java.util.Scanner;
 public class MenuManager {
     private Scanner scanner;
     private TaskService taskService;
+    private ActivityLogger activityLogger;
     private User currentUser;
     private UserQueue userQueue; // Add this field
     private UserService userService; // Add this field
@@ -22,6 +31,7 @@ public class MenuManager {
         this.currentUser = user;
         this.userQueue = new UserQueue(); // Initialize userQueue
         this.userService = new UserService(); // Initialize userService
+        this.activityLogger = new ActivityLogger();
     }
 
     public void start() {
@@ -41,13 +51,14 @@ public class MenuManager {
                     handleTaskTreeMenu();
                     break;
                 case 2:
-                    System.out.println("Activity Log - Coming Soon!");
+                    activityLogger.activityLogMenu(scanner);
+                    activityLogger.log("User membuka menu Task Tree");
                     break;
                 case 3:
                     handleUserQueueMenu();
                     break;
                 case 4:
-                    System.out.println("Search & Sort Tasks - Coming Soon!");
+                    handleSearchSortMenu();
                     break;
                 case 5:
                     if (currentUser.isAdmin()) {
@@ -95,6 +106,36 @@ public class MenuManager {
             case 3:
                 System.out.println("Add Subtask - Coming Soon!");
                 break;
+        }
+    }
+
+    private void handleSearchSortMenu() {
+        System.out.println("\n=== Search & Sort Tasks ===");
+        System.out.println("1. Search Tasks by Keyword");
+        System.out.println("2. Sort Tasks by Priority");
+        System.out.println("3. Sort Tasks by Deadline");
+        System.out.println("0. Back to Main Menu");
+        System.out.print("Choose option: ");
+
+        int choice = getChoice();
+        List<Task> userTasks = taskService.getAllTasks(currentUser.getId());
+
+        switch (choice) {
+            case 1:
+                System.out.print("Enter keyword: ");
+                String keyword = scanner.nextLine();
+                TaskSearcher.displaySearchResults(userTasks, keyword);
+                break;
+            case 2:
+                TaskSorter.displayTasksSortedByPriority(userTasks);
+                break;
+            case 3:
+                TaskSorter.displayTasksSortedByDeadline(userTasks);
+                break;
+            case 0:
+                return;
+            default:
+                System.out.println("Invalid option!");
         }
     }
 
