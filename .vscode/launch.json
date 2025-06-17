@@ -6,7 +6,11 @@
       "name": "Main",
       "request": "launch",
       "mainClass": "com.taskbuddy.Main",
+<<<<<<< HEAD
       "projectName": "task-buddy_ac843f33"
+=======
+      "projectName": "task-buddy_5bfb9393"
+>>>>>>> 0879b30348416677d9dcead3f62a6d2b34c986a8
     },
     {
       "type": "java",
