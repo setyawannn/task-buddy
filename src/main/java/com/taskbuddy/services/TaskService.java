@@ -274,30 +274,64 @@ public class TaskService {
         return false;
     }
 
-    /**
-     * Delete task
-     */
     public boolean deleteTask(int taskId, int userId) {
-        try {
-            Connection conn = DatabaseConnection.getConnection();
-            String sql = "DELETE FROM tasks WHERE id = ? AND user_id = ?";
-
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, taskId);
-            stmt.setInt(2, userId);
-
-            int result = stmt.executeUpdate();
-            stmt.close();
-
-            if (result > 0) {
-                System.out.println("Task deleted successfully!");
-                return true;
+        List<Task> allUserTasks = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn
+                        .prepareStatement("SELECT id, parent_task_id FROM tasks WHERE user_id = ?")) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Task t = new Task();
+                t.setId(rs.getInt("id"));
+                Object parentIdObj = rs.getObject("parent_task_id");
+                if (parentIdObj != null) {
+                    t.setParentTaskId((Integer) parentIdObj);
+                }
+                allUserTasks.add(t);
             }
-
         } catch (SQLException e) {
-            System.err.println("Error deleting task: " + e.getMessage());
+            System.err.println("Error fetching tasks for deletion: " + e.getMessage());
+            return false;
         }
 
-        return false;
+        List<Integer> tasksToDelete = new ArrayList<>();
+        collectTasksToDelete(taskId, allUserTasks, tasksToDelete);
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            conn.setAutoCommit(false);
+
+            String sql = "DELETE FROM tasks WHERE id = ? AND user_id = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                for (Integer id : tasksToDelete) {
+                    stmt.setInt(1, id);
+                    stmt.setInt(2, userId);
+                    stmt.addBatch();
+                }
+                stmt.executeBatch();
+                conn.commit();
+                System.out.println("Task and its subtasks deleted successfully!");
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                System.err.println("Error deleting tasks: " + e.getMessage());
+                return false;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            System.err.println("Database transaction error: " + e.getMessage());
+            return false;
+        }
     }
+
+    private void collectTasksToDelete(int parentId, List<Task> allTasks, List<Integer> tasksToDelete) {
+        tasksToDelete.add(parentId);
+        for (Task task : allTasks) {
+            if (task.getParentTaskId() != null && task.getParentTaskId() == parentId) {
+                collectTasksToDelete(task.getId(), allTasks, tasksToDelete);
+            }
+        }
+    }
+
 }

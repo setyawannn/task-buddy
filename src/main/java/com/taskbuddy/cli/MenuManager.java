@@ -24,6 +24,7 @@ public class MenuManager {
     private User currentUser;
     private UserQueue userQueue; // Add this field
     private UserService userService; // Add this field
+    private TaskMenu taskMenu;
 
     public MenuManager(User user) {
         this.scanner = new Scanner(System.in);
@@ -32,6 +33,7 @@ public class MenuManager {
         this.userQueue = new UserQueue(); // Initialize userQueue
         this.userService = new UserService(); // Initialize userService
         this.activityLogger = new ActivityLogger();
+        this.taskMenu = new TaskMenu(taskService, scanner, currentUser);
     }
 
     public void start() {
@@ -86,27 +88,8 @@ public class MenuManager {
     }
 
     private void handleTaskTreeMenu() {
-        System.out.println("\n=== Task Tree Management ===");
-        System.out.println("Logged in as: " + currentUser.getUsername());
-        System.out.println("1. View My Task Tree");
-        System.out.println("2. Add New Task");
-        System.out.println("3. Add Subtask");
-        System.out.println("0. Back to Main Menu");
-        System.out.print("Choose option: ");
-
-        int choice = getChoice();
-        switch (choice) {
-            case 1:
-                // PERBAIKAN: Pass user ID ke method
-                taskService.displayTaskTree(currentUser.getId());
-                break;
-            case 2:
-                System.out.println("Add New Task - Coming Soon!");
-                break;
-            case 3:
-                System.out.println("Add Subtask - Coming Soon!");
-                break;
-        }
+        activityLogger.log("User membuka menu Task Tree Management");
+        taskMenu.show();
     }
 
     private void handleSearchSortMenu() {
