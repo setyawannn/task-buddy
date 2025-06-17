@@ -2,6 +2,8 @@ package com.taskbuddy.cli;
 
 import com.taskbuddy.models.User;
 import com.taskbuddy.services.TaskService;
+import com.taskbuddy.services.UserQueue; // Add this import
+import com.taskbuddy.services.UserService; // Add this import
 import java.util.Scanner;
 
 /**
@@ -11,11 +13,15 @@ public class MenuManager {
     private Scanner scanner;
     private TaskService taskService;
     private User currentUser;
+    private UserQueue userQueue; // Add this field
+    private UserService userService; // Add this field
 
     public MenuManager(User user) {
         this.scanner = new Scanner(System.in);
         this.taskService = new TaskService();
         this.currentUser = user;
+        this.userQueue = new UserQueue(); // Initialize userQueue
+        this.userService = new UserService(); // Initialize userService
     }
 
     public void start() {
@@ -38,7 +44,7 @@ public class MenuManager {
                     System.out.println("Activity Log - Coming Soon!");
                     break;
                 case 3:
-                    System.out.println("User Queue - Coming Soon!");
+                    handleUserQueueMenu();
                     break;
                 case 4:
                     System.out.println("Search & Sort Tasks - Coming Soon!");
@@ -89,6 +95,43 @@ public class MenuManager {
             case 3:
                 System.out.println("Add Subtask - Coming Soon!");
                 break;
+        }
+    }
+
+    private void handleUserQueueMenu() {
+        boolean inQueueMenu = true;
+        while (inQueueMenu) {
+            System.out.println("\n=== User Queue Menu ===");
+            System.out.println("1. Tambahkan User ke Antrian");
+            System.out.println("2. Proses Antrian (Dequeue)");
+            System.out.println("3. Tampilkan Antrian");
+            System.out.println("0. Kembali ke Main Menu");
+            System.out.print("Pilih menu: ");
+            int choice = getChoice();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Masukkan username user yang ingin ditambahkan ke antrian: ");
+                    String username = scanner.nextLine().trim();
+                    User userToAdd = userService.findByUsername(username);
+                    if (userToAdd != null) {
+                        userQueue.enqueue(userToAdd);
+                    } else {
+                        System.out.println("User tidak ditemukan!");
+                    }
+                    break;
+                case 2:
+                    userQueue.dequeue();
+                    break;
+                case 3:
+                    userQueue.displayQueue();
+                    break;
+                case 0:
+                    inQueueMenu = false;
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid!");
+            }
         }
     }
 

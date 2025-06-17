@@ -3,8 +3,22 @@ package com.taskbuddy.services;
 import com.taskbuddy.models.User;
 import com.taskbuddy.utils.DatabaseConnection;
 import java.sql.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class UserService {
+    private List<User> users;
+
+    public UserService() {
+        users = new LinkedList<>();
+        // Automatically generate 10 users
+        for (int i = 1; i <= 10; i++) {
+            String username = "user" + i;
+            String email = username + "@mail.com";
+            User.Role role = (i == 1) ? User.Role.ADMIN : User.Role.USER; // Use enum
+            users.add(new User(i, username, email, "password" + i, role)); // Add password if needed
+        }
+    }
 
     public boolean registerUser(String username, String email, String password) {
         try {
@@ -137,5 +151,30 @@ public class UserService {
         }
 
         return null;
+    }
+
+    public User findByUsername(String username) {
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            String sql = "SELECT * FROM users WHERE username = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                int id = rs.getInt("id");
+                String email = rs.getString("email");
+                String password = rs.getString("password");
+                String roleStr = rs.getString("role");
+                User.Role role = User.Role.valueOf(roleStr.toUpperCase());
+                return new User(id, username, email, password, role);
+            }
+        } catch (Exception e) {
+            System.err.println("Error finding user by username: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public List<User> getAllUsers() {
+        return users;
     }
 }
