@@ -3,6 +3,8 @@ package com.taskbuddy.services;
 import com.taskbuddy.models.User;
 import com.taskbuddy.utils.DatabaseConnection;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserService {
 
@@ -138,4 +140,45 @@ public class UserService {
 
         return null;
     }
+
+    
+    public List<User> getAllUsers() {
+    List<User> users = new ArrayList<>();
+    try {
+        Connection conn = DatabaseConnection.getConnection();
+        String sql = "SELECT * FROM users";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            User user = new User(
+                    rs.getInt("id"),
+                    rs.getString("username"),
+                    rs.getString("email"),
+                    rs.getString("password"),
+                    User.Role.valueOf(rs.getString("role"))
+            );
+            users.add(user);
+        }
+    } catch (SQLException e) {
+        System.err.println("Error fetching users: " + e.getMessage());
+    }
+    return users;
+    }
+
+    public boolean deleteUserById(int userId) {
+    try {
+        Connection conn = DatabaseConnection.getConnection();
+        String sql = "DELETE FROM users WHERE id = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, userId);
+
+        int rowsAffected = stmt.executeUpdate();
+        return rowsAffected > 0;
+
+    } catch (SQLException e) {
+        System.err.println("Error deleting user: " + e.getMessage());
+    }
+    return false;
+}
 }

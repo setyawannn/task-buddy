@@ -6,6 +6,13 @@
       "name": "Main",
       "request": "launch",
       "mainClass": "com.taskbuddy.Main",
+      "projectName": "task-buddy_17364a5"
+    },
+    {
+      "type": "java",
+      "name": "Main",
+      "request": "launch",
+      "mainClass": "com.taskbuddy.Main",
       "projectName": "task-buddy_ac0e3560"
     },
     {
