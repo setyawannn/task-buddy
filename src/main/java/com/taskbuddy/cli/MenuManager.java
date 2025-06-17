@@ -2,6 +2,8 @@ package com.taskbuddy.cli;
 
 import com.taskbuddy.models.User;
 import com.taskbuddy.services.TaskService;
+import com.taskbuddy.structures.linkedlist.ActivityLogger;
+
 import java.util.Scanner;
 
 /**
@@ -10,12 +12,14 @@ import java.util.Scanner;
 public class MenuManager {
     private Scanner scanner;
     private TaskService taskService;
+    private ActivityLogger activityLogger;
     private User currentUser;
 
     public MenuManager(User user) {
         this.scanner = new Scanner(System.in);
         this.taskService = new TaskService();
         this.currentUser = user;
+        this.activityLogger = new ActivityLogger();
     }
 
     public void start() {
@@ -35,7 +39,8 @@ public class MenuManager {
                     handleTaskTreeMenu();
                     break;
                 case 2:
-                    System.out.println("Activity Log - Coming Soon!");
+                    activityLogger.activityLogMenu(scanner);
+                    activityLogger.log("User membuka menu Task Tree");
                     break;
                 case 3:
                     System.out.println("User Queue - Coming Soon!");
