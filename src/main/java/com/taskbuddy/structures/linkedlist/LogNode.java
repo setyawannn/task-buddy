@@ -1,6 +1,6 @@
 package com.taskbuddy.structures.linkedlist;
 
-import com.taskbuddy.models.ActivityLog;
+import com.taskbuddy.structures.linkedlist.ActivityLogger.ActivityLog;
 
 public class LogNode {
     private ActivityLog log;

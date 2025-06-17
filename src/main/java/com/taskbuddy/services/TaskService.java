@@ -94,6 +94,8 @@ public class TaskService {
                 return;
             }
 
+            taskTree = new TaskTree();
+
             String sql = "SELECT * FROM tasks WHERE user_id = ? ORDER BY parent_task_id, id";
 
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -197,7 +199,7 @@ public class TaskService {
     }
 
     /**
-     * Mendapatkan semua tasks untuk user tertentu
+     * \\endapatkan semua tasks untuk user tertentu
      */
     public List<Task> getAllTasks(int userId) {
         loadTasksFromDatabase(userId);
