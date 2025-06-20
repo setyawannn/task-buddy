@@ -64,7 +64,8 @@ public class MenuManager {
                     break;
                 case 5:
                     if (currentUser.isAdmin()) {
-                        System.out.println("User Management - Coming Soon!");
+                        UserMenu userMenu = new UserMenu(currentUser);  // panggil user management
+                    userMenu.start();
                     } else {
                         System.out.println("Access denied! Admin only feature.");
                     }
@@ -137,7 +138,7 @@ public class MenuManager {
                 case 1:
                     System.out.print("Masukkan username user yang ingin ditambahkan ke antrian: ");
                     String username = scanner.nextLine().trim();
-                    User userToAdd = userService.findByUsername(username);
+                    User userToAdd = userService.findByUsername(username); 
                     if (userToAdd != null) {
                         userQueue.enqueue(userToAdd);
                     } else {
