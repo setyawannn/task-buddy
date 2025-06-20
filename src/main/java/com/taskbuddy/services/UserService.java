@@ -154,29 +154,27 @@ public class UserService {
         return null;
     }
 
-    
     public List<User> getAllUsers() {
-    List<User> users = new ArrayList<>();
-    try {
-        Connection conn = DatabaseConnection.getConnection();
-        String sql = "SELECT * FROM users";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        ResultSet rs = stmt.executeQuery();
+        List<User> users = new ArrayList<>();
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            String sql = "SELECT * FROM users";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
 
-        while (rs.next()) {
-            User user = new User(
-                    rs.getInt("id"),
-                    rs.getString("username"),
-                    rs.getString("email"),
-                    rs.getString("password"),
-                    User.Role.valueOf(rs.getString("role"))
-            );
-            users.add(user);
+            while (rs.next()) {
+                User user = new User(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        User.Role.valueOf(rs.getString("role")));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching users: " + e.getMessage());
         }
-    } catch (SQLException e) {
-        System.err.println("Error fetching users: " + e.getMessage());
-    }
-    return users;
+        return users;
     }
 
     public boolean deleteUserById(int userId) {
@@ -196,11 +194,23 @@ public class UserService {
     }
 
     public User findByUsername(String username) {
-        for (User user : users) {
-            if (user.getUsername().equalsIgnoreCase(username)) {
-                return user;
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            String sql = "SELECT * FROM users WHERE username = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new User(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        User.Role.valueOf(rs.getString("role")));
             }
+        } catch (SQLException e) {
+            System.err.println("Error finding user by username: " + e.getMessage());
         }
-        return null; 
+        return null;
     }
 }
