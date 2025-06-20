@@ -64,7 +64,8 @@ public class MenuManager {
                     break;
                 case 5:
                     if (currentUser.isAdmin()) {
-                        System.out.println("User Management - Coming Soon!");
+                        UserMenu userMenu = new UserMenu(currentUser);  // panggil user management
+                    userMenu.start();
                     } else {
                         System.out.println("Access denied! Admin only feature.");
                     }
