@@ -77,3 +77,5 @@ INSERT INTO categories (name, parent_id, user_id) VALUES
       ('Development', 1, 2),
       ('Meetings', 1, 2),
       ('Health', 2, 2);
+
+ALTER TABLE tasks ADD COLUMN parent_id INTEGER;
